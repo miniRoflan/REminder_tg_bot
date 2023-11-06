@@ -40,7 +40,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                    break;
 
                default:
-                   sendMessage(chatId, "soryan nema bolshe");
+                   sendMessage(chatId, "sha budet");
            }
         }
 
