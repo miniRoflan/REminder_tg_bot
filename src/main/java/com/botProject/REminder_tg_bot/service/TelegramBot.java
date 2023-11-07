@@ -13,8 +13,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     final BotConfig config;
 
-    public TelegramBot(BotConfig config)
-    {
+    public TelegramBot(BotConfig config) {
         this.config = config;
     }
 
@@ -32,21 +31,29 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
-           String messageText = update.getMessage().getText();
-           long chatId = update.getMessage().getChatId();
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
 
-           switch (messageText) {
-               case "/start":
-                       startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                   break;
-
-               default:
-                   sendMessage(chatId, "sha budet");
-           }
+            switch (messageText) {
+                case "/start":
+                    startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+                    break;
+                case "/help":
+                    helpCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+                    break;
+                default:
+                    sendMessage(chatId, "sha budet");
+            }
         }
 
     }
 
+    private void helpCommandReceived(long chatId, String name)
+    {
+        String answer = CommentText.HELP_COM;
+
+        sendMessage(chatId, answer);
+    }
     private void startCommandReceived(long chatId, String name) {
 
 
