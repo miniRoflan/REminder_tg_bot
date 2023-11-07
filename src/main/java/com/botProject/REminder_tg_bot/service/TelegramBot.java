@@ -1,6 +1,7 @@
 package com.botProject.REminder_tg_bot.service;
 
 import com.botProject.REminder_tg_bot.config.BotConfig;
+import com.botProject.REminder_tg_bot.config.CommentText;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -49,7 +50,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void startCommandReceived(long chatId, String name) {
 
 
-        String answer = "Hi, " + name + ", иди уроки делай";
+        String answer = CommentText.START_COM;
 
 
         sendMessage(chatId, answer);
