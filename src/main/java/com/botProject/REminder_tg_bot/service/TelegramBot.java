@@ -39,7 +39,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/help":
-                    helpCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+                    helpCommandReceived(chatId);
                     break;
                 default:
                     sendMessage(chatId, "sha budet");
@@ -48,7 +48,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    private void helpCommandReceived(long chatId, String name)
+    private void helpCommandReceived(long chatId)
     {
         String answer = CommentText.HELP_COM;
 
