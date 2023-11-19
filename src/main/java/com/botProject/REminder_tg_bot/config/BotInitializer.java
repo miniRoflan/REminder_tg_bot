@@ -9,6 +9,9 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.net.SocketOption;
+import java.sql.SQLOutput;
+
 @Component
 public class BotInitializer {
 
@@ -22,7 +25,7 @@ public class BotInitializer {
             telegramBotsApi.registerBot(bot);
         }
         catch (TelegramApiException e) {
-
+            System.out.println("Error BotInitializer");
         }
     }
 }

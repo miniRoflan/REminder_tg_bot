@@ -8,7 +8,7 @@ public class CommentText {
             "/start - Перезапустить бота\n" +
             "/list  - Список напоминаний";
     public static final String START_COM =
-            "Привет, это бот Reminder, он поможет Вам не забыть о ваших делах \n\n" +
+            "Это бот Reminder, он поможет Вам не забыть о ваших делах \n\n" +
             "Для списка комманд введите: /help";
     public static final String ADD_REMIND_COM =
             "Напоминание успешно добавлено, полный список можете посмотреть по команде: /list";
