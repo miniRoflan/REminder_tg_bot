@@ -3,6 +3,8 @@ package com.botProject.REminder_tg_bot.service;
 import com.botProject.REminder_tg_bot.config.BotConfig;
 import com.botProject.REminder_tg_bot.config.CommentText;
 import com.botProject.REminder_tg_bot.data_base_mod.User;
+import com.botProject.REminder_tg_bot.data_base_mod.UserCheck;
+import com.botProject.REminder_tg_bot.data_base_mod.UserCheckRepository;
 import com.botProject.REminder_tg_bot.data_base_mod.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,19 +22,14 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserCheckRepository userCheckRepository;
+
     final BotConfig config;
 
-    private boolean remindCheck;
-
-    private  boolean dateCheck;
-
-    private String remind;
 
     public TelegramBot(BotConfig config) {
         this.config = config;
-        this.remindCheck = false;
-        this.dateCheck = false;
-        this.remind = null;
     }
 
     @Override
@@ -47,10 +44,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        long chatId = update.getMessage().getChatId();
+
+        registerUser(chatId);
+        UserCheck userCheck = userCheckRepository.findByChatId(chatId);
+
+        boolean remindCheck = userCheck.isRemindCheck();
+        boolean dateCheck = userCheck.isDateCheck();
 
         if (update.hasMessage() && update.getMessage().hasText() && !remindCheck && !dateCheck) {
             String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
 
             switch (messageText) {
                 case "/start":
@@ -61,7 +64,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
                 case "/add_remind":
                     sendMessage(chatId, CommentText.ADD_REMIND_COM);
-                    remindCheck = true;
+                    userCheck.setRemindCheck(true);
                     break;
                 default:
                     sendMessage(chatId, "error command =(\n please try again");
@@ -69,19 +72,18 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         } else if (update.hasMessage() && update.getMessage().hasText() && remindCheck) {
             String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
 
             if (!messageText.equals("/cansel")) {
-                dateCheck = true;
-                remind = messageText;
+                userCheck.setDateCheck(true);
+                userCheck.setRemind(messageText);
+
                 sendMessage(chatId, CommentText.ADD_DATE_COM);
             }
 
-            remindCheck = false;
+            userCheck.setRemindCheck(false);
 
         } else if (update.hasMessage() && update.getMessage().hasText() && dateCheck) {
             String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
 
             if (!messageText.equals("/cansel")) {
                 String timeMessage = messageText + ":00";
@@ -98,12 +100,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                add_remindCommandReceived(chatId, remind, time);
+                add_remindCommandReceived(chatId, userCheck.getRemind(), time);
             }
 
-            dateCheck = false;
-            remind = null;
+            userCheck.setDateCheck(false);
+            userCheck.setRemind(null);
         }
+
+        userCheckRepository.save(userCheck);
     }
 
     private void add_remindCommandReceived(long chatId, String remind, Timestamp time) {
@@ -116,6 +120,20 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         userRepository.save(user);
         sendMessage(chatId, "Напоминание успешно добавлено!");
+    }
+
+    private void registerUser(Long chatId) {
+
+        if (userCheckRepository.findById(chatId).isEmpty()) {
+            UserCheck userCheck = new UserCheck();
+
+            userCheck.setChatId(chatId);
+            userCheck.setDateCheck(false);
+            userCheck.setRemindCheck(false);
+            userCheck.setRemind(null);
+
+            userCheckRepository.save(userCheck);
+        }
     }
 
     private void helpCommandReceived(long chatId) {
